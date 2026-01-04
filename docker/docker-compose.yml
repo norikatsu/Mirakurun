@@ -4,7 +4,7 @@ services:
     build:
       context: ../
       dockerfile: docker/Dockerfile
-    image: chinachu/mirakurun:latest
+    image: chinachu/mirakurun:3.9.0-rc.4
     container_name: mirakurun
     cap_add:
       - SYS_ADMIN
@@ -37,6 +37,9 @@ services:
       - type: bind
         source: /opt/mirakurun/data/
         target: /app-data/
+      - type: bind
+        source: /opt/mirakurun/bin/
+        target: /app-bin/
     restart: always
     logging:
       driver: json-file
