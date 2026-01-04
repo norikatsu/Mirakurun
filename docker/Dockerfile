@@ -1,20 +1,26 @@
-ARG ARCH=
-FROM --platform=$BUILDPLATFORM ${ARCH}node:18.15.0-buster AS build
+FROM ubuntu:24.04 AS build
 WORKDIR /app
 ENV DOCKER=YES NODE_ENV=production
 ADD . .
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends build-essential && \
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y --no-install-recommends \
+        build-essential \
+        nodejs \
+        npm \
+        && \
     npm install --production=false && \
     npm run build && \
     npm install -g --unsafe-perm --production
 
-FROM ${ARCH}node:18.15.0-buster-slim
+FROM ubuntu:24.04
 WORKDIR /app
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y --no-install-recommends \
+        build-essential \
+        nodejs \
+        npm \
         ca-certificates \
         make \
         gcc \
@@ -27,7 +33,7 @@ RUN apt-get update && \
         pcsc-tools \
         dvb-tools \
         && \
-    apt-get clean && \
+    apt clean && \
     rm -rf /var/lib/apt/lists/*
 COPY --from=build /usr/local/lib/node_modules/mirakurun /app
 CMD ["./docker/container-init.sh"]

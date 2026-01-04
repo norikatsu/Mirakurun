@@ -50,18 +50,19 @@ if !(type "arib-b25-stream-test" > /dev/null 2>&1); then
   ln -sv /opt/node_modules/arib-b25-stream-test/bin/b25 /opt/bin/arib-b25-stream-test
 fi
 
-if [ -e "/etc/init.d/pcscd" ]; then
-  while :; do
-    echo "starting pcscd..."
-    /etc/init.d/pcscd start
-    sleep 1
-    timeout 2 pcsc_scan | grep -A 50 "Using reader plug'n play mechanism"
-    if [ $? = 0 ]; then
-      break;
-    fi
-    echo "failed!"
-  done
-fi
+## disable...
+## if [ -e "/etc/init.d/pcscd" ]; then
+##   while :; do
+##     echo "starting pcscd..."
+##     /etc/init.d/pcscd start
+##     sleep 1
+##     timeout 2 pcsc_scan | grep -A 50 "Using reader plug'n play mechanism"
+##     if [ $? = 0 ]; then
+##       break;
+##     fi
+##     echo "failed!"
+##   done
+## fi
 
 function start() {
   if [ "$DEBUG" != "true" ]; then
