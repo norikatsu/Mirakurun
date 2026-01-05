@@ -1,0 +1,35 @@
+ARG ARCH=
+FROM ubuntu:24.04 AS build
+
+# rustupをインストール
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        autoconf  \
+        automake \
+        cmake \
+        libtool \
+        libclang-dev  \
+        libpcsclite-dev  \
+        libdvbv5-dev \
+        libudev-dev \
+        git \
+        curl \
+        ca-certificates \
+        pkg-config && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
+
+
+# $HOME/.cargo/env の内容をPATHに追加する [1, 4]
+# Dockerfileでは source コマンドが直接使えないため、RUNコマンド内でパスを設定する
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+WORKDIR /app
+RUN git clone --recursive https://github.com/kazuki0824/recisdb-rs.git && \
+    cd recisdb-rs && \
+    cargo build -F dvb --release
+
+# COPY recisdb-rs /app/recisdb-rs
+# RUN cd recisdb-rs && \
+#     cargo build -F dvb --release

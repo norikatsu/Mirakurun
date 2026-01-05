@@ -1,0 +1,41 @@
+FROM ubuntu:24.04 AS build
+WORKDIR /app
+ENV DOCKER=YES NODE_ENV=production
+ADD . .
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        autoconf \
+        automake \
+        cmake \
+        libtool \
+        libpcsclite-dev \
+        libdvbv5-dev \
+        libudev-dev \
+        git \
+        curl \
+        ca-certificates \
+        pkg-config \
+        && \
+    git clone https://github.com/tsunoda14/libyakisoba.git && \
+    cd libyakisoba && \
+    autoreconf -i && \
+    mkdir build && \
+    cd build && \
+    ../configure --sysconfdir /usr/local/etc && \
+    make && \
+    make install && \
+    ls /usr/local/lib && \
+    cd ../.. && \
+    git clone https://github.com/tsunoda14/libsobacas.git   && \
+    cd libsobacas  && \
+    autoreconf -i  && \
+    mkdir build  && \
+    cd build  && \
+    ../configure  && \
+    make  && \
+    make install  && \
+    ls /usr/local/lib
+
+
