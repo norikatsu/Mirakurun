@@ -90,7 +90,19 @@ RUN apt update && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 COPY --from=build /usr/local/lib/node_modules/mirakurun /app
-
+# COPY from build_lib
+COPY --from=build_lib /app/recisdb-rs/target/release/recisdb /usr/local/bin/
+COPY --from=build_lib /usr/local/lib/libsobacas.a /usr/local/lib/
+COPY --from=build_lib /usr/local/lib/libsobacas.la /usr/local/lib/
+COPY --from=build_lib /usr/local/lib/libsobacas.so.0.0.0 /usr/local/lib/
+COPY --from=build_lib /usr/local/lib/libyakisoba.a /usr/local/lib/
+COPY --from=build_lib /usr/local/lib/libyakisoba.la /usr/local/lib/
+COPY --from=build_lib /usr/local/lib/libyakisoba.so.0.0.1 /usr/local/lib/
+RUN cd /usr/local/lib && \
+    ln -s ./libsobacas.so.0.0.0 ./libsobacas.so && \
+    ln -s ./libsobacas.so.0.0.0 ./libsobacas.so.0 && \
+    ln -s ./libyakisoba.so.0.0.1 ./libyakisoba.so && \
+    ln -s ./libyakisoba.so.0.0.1 ./libyakisoba.so.0
 
 CMD ["./docker/container-init.sh"]
 EXPOSE 40772 9229
