@@ -31,7 +31,7 @@ RUN git clone https://github.com/tsunoda14/libyakisoba.git && \
     autoreconf -i && \
     mkdir build && \
     cd build && \
-    ../configure --sysconfdir /usr/local/etc && \
+    ../configure --sysconfdir /app-config && \
     make && \
     make install
 
