@@ -37,9 +37,9 @@ services:
       - type: bind
         source: /opt/mirakurun/data/
         target: /app-data/
-      - type: bind
-        source: /opt/mirakurun/bin/
-        target: /app-bin/
+      # - type: bind
+      #   source: /opt/mirakurun/bin/
+      #   target: /app-bin/
     restart: always
     logging:
       driver: json-file
