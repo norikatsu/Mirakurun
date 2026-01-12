@@ -131,7 +131,17 @@ RUN git clone --recursive https://github.com/norikatsu/recisdb-rs.git && \
 # Remove libyakisoba & sobacas files
 RUN rm -rf ./libyakisoba && \
     rm -rf ./libsobacas && \
-    rm -rf ./recisdb-rs
+    rm -rf ./recisdb-rs && \
+    rm -rf /root/.cargo
+
+# # Remove unuse apt packages
+# RUN apt remove -y automake && \
+#     apt remove -y build-essential && \
+#     apt remove -y autoconf && \
+#     apt remove -y cmake && \
+#     apt autoremove -y && \
+#     apt clean && \
+#     rm -rf /var/lib/apt/lists/*
 
 # COPY mirakurun
 COPY --from=build /usr/local/lib/node_modules/mirakurun /app
