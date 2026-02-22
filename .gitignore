@@ -1,3 +1,4 @@
+# Mirakurun
 /node_modules
 /lib
 /tmp
@@ -11,3 +12,26 @@
 *.tsbuildinfo
 test.*
 .DS_Store
+
+# Epgstation
+*.swp
+*.log
+*.log.*
+*.log-*
+/recorded/*
+#/mirakurun/data/*
+#/mirakurun/conf/*
+/epgstation/custom.Dockerfile
+/epgstation/thumbnail/*.jpg
+/epgstation/data/streamfiles/*.ts
+/epgstation/data/streamfiles/*.m3u8
+/epgstation/config/*
+!/epgstation/config/enc.js.template
+!/epgstation/config/config.yml.template
+!/epgstation/config/operatorLogConfig.sample.yml
+!/epgstation/config/epgUpdaterLogConfig.sample.yml
+!/epgstation/config/serviceLogConfig.sample.yml
+/epgstation/data/*.json
+/docker-compose.yml
+!.gitkeep
+
