@@ -2,7 +2,7 @@
 
 #git clone  https://github.com/norikatsu/docker-epgstation
 #cd docker-epgstation
-cp docker-compose-sample.yml docker-compose.yml
+#cp docker-compose-sample.yml docker-compose.yml
 cp epgstation/config/enc.js.template epgstation/config/enc.js
 cp epgstation/config/config.yml.template epgstation/config/config.yml
 cp epgstation/config/operatorLogConfig.sample.yml epgstation/config/operatorLogConfig.yml
