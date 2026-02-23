@@ -1,0 +1,101 @@
+version: "3.7"
+services:
+  mirakurun:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    image: norikatsu/mirakurun:3.9.0-rc.4_recisdb
+    container_name: mirakurun
+    cap_add:
+      - SYS_ADMIN
+      - SYS_NICE
+    environment:
+      TZ: Asia/Tokyo
+      # DOCKER_NETWORK: host
+      # LOG_LEVEL: "3"
+      # DEBUG: "true"
+    # network_mode: host
+    devices:
+      - /dev/bus:/dev/bus
+      - /dev/dvb:/dev/dvb
+    volumes:
+      # ** CAUTION **
+      # (default) `/usr/local/mirakurun/*` has been moved to `/opt/mirakurun/*`
+      # try:
+      #   sudo mv -vf /usr/local/mirakurun /opt/mirakurun
+      #   sudo mkdir -p /opt/mirakurun/run /opt/mirakurun/opt /opt/mirakurun/config /opt/mirakurun/data
+      # you can change to any location if required.
+      - type: bind
+        source: /opt/mirakurun/run/
+        target: /var/run/
+      - type: bind
+        source: /opt/mirakurun/opt/
+        target: /opt/
+      - type: bind
+        source: /opt/mirakurun/config/
+        target: /app-config/
+      - type: bind
+        source: /opt/mirakurun/data/
+        target: /app-data/
+      # - type: bind
+      #   source: /opt/mirakurun/bin/
+      #   target: /app-bin/
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-file: "1"
+        max-size: 10m
+    ports:
+      - "40772:40772"
+      - "9229:9229"
+
+
+  mysql:
+      image: mariadb:10.5
+      # image: mysql:8.0 # 囲み文字を使用する場合
+      volumes:
+          - mysql-db:/var/lib/mysql
+      environment:
+          MYSQL_USER: epgstation
+          MYSQL_PASSWORD: epgstation
+          MYSQL_ROOT_PASSWORD: epgstation
+          MYSQL_DATABASE: epgstation
+          TZ: "Asia/Tokyo"
+      command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --performance-schema=false --expire_logs_days=1 # for mariadb
+      # command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_as_ci --performance-schema=false --expire_logs_days=1 --default-authentication-plugin=mysql_native_password # for myql
+      restart: always
+      logging:
+          options:
+              max-size: "10m"
+              max-file: "3"
+
+  epgstation:
+      build:
+          context: "../epgstation"
+          dockerfile: "debian.Dockerfile"
+      volumes:
+          - /opt/epgstation/config:/app/config
+          - /opt/epgstation/data:/app/data
+          - /opt/epgstation/thumbnail:/app/thumbnail
+          - /opt/epgstation/logs:/app/logs
+          - /opt/recorded:/app/recorded
+      environment:
+          TZ: "Asia/Tokyo"
+      depends_on:
+          - mirakurun
+          - mysql
+      ports:
+          - "8888:8888"
+          - "8889:8889"
+#         user: "1000:1000"
+#         devices:
+#             - /dev/dri:/dev/dri
+      restart: always
+
+volumes:
+    mysql-db:
+        driver: local
+
+
+

@@ -1,5 +1,4 @@
-# Mirakurn Docker イメージ作成から起動まで (TV視聴のみの環境)
-
+# Mirakurn & EPGstation Docker イメージ作成から起動まで (TV録画環境)
 
 ## Mirakurun で使用する ./scanned ファイル群を作成
 
@@ -28,14 +27,14 @@ $ isdb-scanner ./scanned/      : BS の有料放送と CS チャンネルをス�
 ```
 
 
-## Mirakurun docker イメージ準備
+## Mirakurun & EPGstation docker イメージ準備
 
 ```
 $ git clone -b recisdb-rs https://github.com/norikatsu/Mirakurun   (ブランチ recisdb-rs に自分の編集を加えているのでこれを cloneする )
 $ cd Mirakurun
-$ docker/setup.sh                                                  (必要ディレクトの作成)
-$ docker compose -f ./docker/docker-compose.yml build
-$ cd docker
+$ docker_for_epg/setup.sh                                                  (必要ディレクトの作成)
+$ docker compose -f ./docker_for_epg/docker-compose.yml build
+$ cd docker_for_epg
 $ docker compose run --rm -e SETUP=true mirakurun
 ```
 
@@ -52,11 +51,11 @@ $ sudo cp bcas_keys                        /opt/mirakurun/config/
 
 ## 起動・停止
 ```
-$ cd  "clone した Mirakurun の docker フォルダ" に移動(カレントに docker-compose.yml ファイルがあること)
+$ cd  "clone した Mirakurun の docker_for_epg フォルダ" に移動(カレントに docker-compose.yml ファイルがあること)
 $ sudo docker compose up -d
 ```
 
 ```
-$ cd  "clone した Mirakurun の docker フォルダ" に移動(カレントに docker-compose.yml ファイルがあること)
+$ cd  "clone した Mirakurun の docker_for_epg フォルダ" に移動(カレントに docker-compose.yml ファイルがあること)
 $ sudo docker compose down
 ```
