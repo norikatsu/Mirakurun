@@ -75,11 +75,11 @@ services:
           context: "../epgstation"
           dockerfile: "debian.Dockerfile"
       volumes:
-          - ../epgstation/config:/app/config
-          - ../epgstation/data:/app/data
-          - ../epgstation/thumbnail:/app/thumbnail
-          - ../epgstation/logs:/app/logs
-          - ../recorded:/app/recorded
+          - /opt/epgstation/config:/app/config
+          - /opt/epgstation/data:/app/data
+          - /opt/epgstation/thumbnail:/app/thumbnail
+          - /opt/epgstation/logs:/app/logs
+          - /opt/recorded:/app/recorded
       environment:
           TZ: "Asia/Tokyo"
       depends_on:
