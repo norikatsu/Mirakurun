@@ -11,10 +11,10 @@ services:
       - SYS_NICE
     environment:
       TZ: Asia/Tokyo
-      DOCKER_NETWORK: host
+      # DOCKER_NETWORK: host
       # LOG_LEVEL: "3"
       # DEBUG: "true"
-    network_mode: host
+    # network_mode: host
     devices:
       - /dev/bus:/dev/bus
       - /dev/dvb:/dev/dvb
@@ -46,6 +46,9 @@ services:
       options:
         max-file: "1"
         max-size: 10m
+    ports:
+      - "40772:40772"
+      - "9229:9229"
 
 
   mysql:
