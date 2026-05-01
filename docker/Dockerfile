@@ -64,7 +64,7 @@ RUN apt update && \
         && \
     npm install --production=false && \
     npm run build && \
-    npm ci --omit=dev
+    npm install -g --unsafe-perm --production
 
 ##### Main image
 FROM ubuntu:24.04
