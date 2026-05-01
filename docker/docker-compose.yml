@@ -11,6 +11,7 @@ services:
       - SYS_NICE
     environment:
       TZ: Asia/Tokyo
+      DISABLE_PCSCD: "1"
       # DOCKER_NETWORK: host
       # LOG_LEVEL: "3"
       # DEBUG: "true"
