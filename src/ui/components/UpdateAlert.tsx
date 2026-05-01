@@ -24,6 +24,7 @@ import {
 import { Version } from "../../../api";
 
 const UpdateAlert: React.FC = () => {
+
     const [updateAvailable, setUpdateAvailable] = useState<boolean>(false);
     const [version, setVersion] = useState<Version>(null);
 

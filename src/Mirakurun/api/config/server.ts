@@ -14,13 +14,12 @@
    limitations under the License.
 */
 import { Operation } from "express-openapi";
-import * as api from "../../api";
-import * as apid from "../../../../api";
 import * as config from "../../config";
 
-export const get: Operation = async (req, res) => {
+export const get: Operation = (req, res) => {
+
     res.status(200);
-    api.responseJSON(res, await config.loadServer() as apid.ConfigServer);
+    res.json(config.loadServer());
 };
 
 get.apiDoc = {
@@ -42,13 +41,14 @@ get.apiDoc = {
     }
 };
 
-export const put: Operation = async (req, res) => {
-    const server: apid.ConfigServer = req.body;
+export const put: Operation = (req, res) => {
 
-    await config.saveServer(server);
+    const server: config.Server = req.body;
+
+    config.saveServer(server);
 
     res.status(200);
-    api.responseJSON(res, server);
+    res.json(server);
 };
 
 put.apiDoc = {

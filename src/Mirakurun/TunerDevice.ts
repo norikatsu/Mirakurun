@@ -31,10 +31,10 @@ interface User extends common.User {
     _stream?: TSFilter;
 }
 
-export interface TunerDeviceStatus {
+interface Status {
     readonly index: number;
     readonly name: string;
-    readonly types: apid.ChannelType[];
+    readonly types: common.ChannelType[];
     readonly command: string;
     readonly pid: number;
     readonly users: common.User[];
@@ -46,6 +46,7 @@ export interface TunerDeviceStatus {
 }
 
 export default class TunerDevice extends EventEmitter {
+
     private _channel: ChannelItem = null;
     private _command: string = null;
     private _process: child_process.ChildProcess = null;
@@ -60,7 +61,7 @@ export default class TunerDevice extends EventEmitter {
     private _exited = false;
     private _closing = false;
 
-    constructor(private _index: number, private _config: apid.ConfigTunersItem) {
+    constructor(private _index: number, private _config: config.Tuner) {
         super();
         this._isRemote = !!this._config.remoteMirakurunHost;
         Event.emit("tuner", "create", this.toJSON());
@@ -71,7 +72,7 @@ export default class TunerDevice extends EventEmitter {
         return this._index;
     }
 
-    get config(): apid.ConfigTunersItem {
+    get config(): config.Tuner {
         return this._config;
     }
 
@@ -126,6 +127,7 @@ export default class TunerDevice extends EventEmitter {
     }
 
     getPriority(): number {
+
         let priority = -2;
 
         for (const user of this._users) {
@@ -137,7 +139,7 @@ export default class TunerDevice extends EventEmitter {
         return priority;
     }
 
-    toJSON(): TunerDeviceStatus {
+    toJSON(): Status {
         return {
             index: this._index,
             name: this._config.name,
@@ -158,6 +160,7 @@ export default class TunerDevice extends EventEmitter {
     }
 
     async startStream(user: User, stream: TSFilter, channel?: ChannelItem): Promise<void> {
+
         log.debug("TunerDevice#%d start stream for user `%s` (priority=%d)...", this._index, user.id, user.priority);
 
         if (this._isAvailable === false) {
@@ -201,6 +204,7 @@ export default class TunerDevice extends EventEmitter {
     }
 
     endStream(user: User): void {
+
         log.debug("TunerDevice#%d end stream for user `%s` (priority=%d)...", this._index, user.id, user.priority);
 
         user._stream.end();
@@ -220,6 +224,7 @@ export default class TunerDevice extends EventEmitter {
     }
 
     async getRemotePrograms(query?: ProgramsQuery): Promise<apid.Program[]> {
+
         if (!this._isRemote) {
             throw new Error(util.format("TunerDevice#%d is not remote device", this._index));
         }
@@ -239,6 +244,7 @@ export default class TunerDevice extends EventEmitter {
     }
 
     private _spawn(ch: ChannelItem): void {
+
         log.debug("TunerDevice#%d spawn...", this._index);
 
         if (this._process) {
@@ -260,16 +266,29 @@ export default class TunerDevice extends EventEmitter {
             cmd = this._config.command;
         }
 
-        cmd = common.replaceCommandTemplate(cmd, {
-            channel: ch.channel,
-            satelite: ch.commandVars?.satellite || "", // deprecated, for backward compatibility
-            space: 0, // default value for backward compatibility
-            ...ch.commandVars
-        });
+        cmd = cmd.replace("<channel>", ch.channel);
 
-        const parsed = common.parseCommandForSpawn(cmd);
+        if (ch.satellite) {
+            cmd = cmd.replace("<satelite>", ch.satellite); // deprecated
+            cmd = cmd.replace("<satellite>", ch.satellite);
+        }
 
-        this._process = child_process.spawn(parsed.command, parsed.args);
+        // tslint:disable-next-line:prefer-conditional-expression
+        if (ch.space) {
+            cmd = cmd.replace("<space>", ch.space.toString(10));
+        } else {
+            cmd = cmd.replace("<space>", "0"); // set default value to '0'
+        }
+
+        if (ch.freq !== undefined) {
+            cmd = cmd.replace("<freq>", ch.freq.toString(10));
+        }
+
+        if (ch.polarity) {
+            cmd = cmd.replace("<polarity>", ch.polarity);
+        }
+
+        this._process = child_process.spawn(cmd.split(" ")[0], cmd.split(" ").slice(1));
         this._command = cmd;
         this._channel = ch;
 
@@ -277,12 +296,14 @@ export default class TunerDevice extends EventEmitter {
             const cat = child_process.spawn("cat", [this._config.dvbDevicePath]);
 
             cat.once("error", (err) => {
+
                 log.error("TunerDevice#%d cat process error `%s` (pid=%d)", this._index, err.name, cat.pid);
 
                 this._kill(false);
             });
 
             cat.once("close", (code, signal) => {
+
                 log.debug(
                     "TunerDevice#%d cat process has closed with code=%d by signal `%s` (pid=%d)",
                     this._index, code, signal, cat.pid
@@ -303,6 +324,7 @@ export default class TunerDevice extends EventEmitter {
         this._process.once("exit", () => this._exited = true);
 
         this._process.once("error", (err) => {
+
             log.fatal("TunerDevice#%d process error `%s` (pid=%d)", this._index, err.name, this._process.pid);
 
             ++this._fatalCount;
@@ -317,6 +339,7 @@ export default class TunerDevice extends EventEmitter {
         });
 
         this._process.once("close", (code, signal) => {
+
             log.info(
                 "TunerDevice#%d process has closed with exit code=%d by signal `%s` (pid=%d)",
                 this._index, code, signal, this._process.pid
@@ -338,12 +361,14 @@ export default class TunerDevice extends EventEmitter {
     }
 
     private _streamOnData(chunk: Buffer): void {
+
         for (const user of this._users) {
             user._stream.write(chunk);
         }
     }
 
     private _end(): void {
+
         this._isAvailable = false;
 
         this._stream.removeAllListeners("data");
@@ -359,6 +384,7 @@ export default class TunerDevice extends EventEmitter {
     }
 
     private async _kill(close: boolean): Promise<void> {
+
         log.debug("TunerDevice#%d kill...", this._index);
 
         if (!this._process || !this._process.pid) {
@@ -374,9 +400,15 @@ export default class TunerDevice extends EventEmitter {
         this._updated();
 
         await new Promise<void>(resolve => {
+
             this.once("release", resolve);
 
-            if (/^dvbv5-zap /.test(this._command) === true) {
+            if (process.platform === "win32") {
+                const timer = setTimeout(() => this._process.kill(), 3000);
+                this._process.once("exit", () => clearTimeout(timer));
+
+                this._process.stdin.write("\n");
+            } else if (/^dvbv5-zap /.test(this._command) === true) {
                 this._process.kill("SIGKILL");
             } else {
                 const timer = setTimeout(() => {
@@ -392,6 +424,7 @@ export default class TunerDevice extends EventEmitter {
     }
 
     private _release(): void {
+
         if (this._process) {
             this._process.stderr.removeAllListeners();
             this._process.removeAllListeners();

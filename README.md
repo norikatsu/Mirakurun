@@ -1,8 +1,8 @@
-[![Mirakurun](https://gist.githubusercontent.com/kanreisa/0ab27d7771e97edce5a24cc81b9b8ce6/raw/8e08d3d91390794b139ed593e3a834a8b41f651c/logo-mirakurun_2025-03-29.svg)](https://github.com/Chinachu/Mirakurun)
+[![Mirakurun](https://gist.githubusercontent.com/kanreisa/0ab27d7771e97edce5a24cc81b9b8ce6/raw/e50683f1c4e7d1a13e9ef468f8cc945b0dbc853c/logo-mirakurun.svg)](https://github.com/Chinachu/Mirakurun)
 
 # Mirakurun
 
-A Japanese digital TV tuner API server specifically designed for "Air" (code name of the app in development).
+DVR Tuner Server for Japanese TV which designed for the "Air" (in development codename).
 
 [![npm version][npm-img]][npm-url]
 [![npm downloads][downloads-image]][downloads-url]
@@ -11,16 +11,12 @@ A Japanese digital TV tuner API server specifically designed for "Air" (code nam
 [![Backers on Open Collective](https://opencollective.com/Mirakurun/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/Mirakurun/sponsors/badge.svg)](#sponsors)
 
-[**CHANGELOG**](CHANGELOG.md) | [**Setup Guide**](doc/Platforms.md) | [**Configuration**](doc/Configuration.md)
-
-[**English**](README.md) | [**日本語**](README.ja.md)
-
 ## Dockerビルド＆実行等について
 
 - docker         : Mirakurun のみ(TV視聴のみ）
 - docker_for_epg : Mirakurun & EPGstation (TV録画)
 
-setup.shスクリプト、"compose build" の作業は 本リポジトリの直下 "Mirakurun" をカレントにして行うこと
+setup.shスクリプト、"compose build" の作業は 本リポジトリの直下 "Mirakurun" をカレントにして行うこと 
 
 
 

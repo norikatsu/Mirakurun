@@ -19,9 +19,10 @@ import * as api from "../api";
 import * as apid from "../../../api";
 import _ from "../_";
 import Service from "../Service";
-import { channelTypes } from "../common";
+import { ChannelTypes } from "../common";
 
 export const get: Operation = async (req, res) => {
+
     const serviceItems = [..._.service.items]; // shallow copy
     serviceItems.sort((a, b) => a.getOrder() - b.getOrder());
 
@@ -69,7 +70,7 @@ get.apiDoc = {
             in: "query",
             name: "channel.type",
             type: "string",
-            enum: channelTypes,
+            enum: Object.keys(ChannelTypes),
             required: false
         },
         {

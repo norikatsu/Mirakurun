@@ -26,6 +26,7 @@ import TunersConfigurator from "./TunersConfigurator";
 import ChannelsConfigurator from "./ChannelsConfigurator";
 
 const ConfigView: React.FC<{ uiState: UIState, uiStateEvents: EventEmitter }> = ({ uiState, uiStateEvents }) => {
+
     const [key, setKey] = useState<string>("server");
 
     return (

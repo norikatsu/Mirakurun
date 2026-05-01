@@ -14,17 +14,15 @@
    limitations under the License.
 */
 import * as os from "os";
-import { promisify } from "util";
-import { exec } from "child_process";
 import { Validator } from "ip-num/Validator";
 import { IPv4, IPv6 } from "ip-num/IPNumber";
 import { IPv4Prefix, IPv6Prefix } from "ip-num/Prefix";
 import { IPv4CidrRange, IPv6CidrRange } from "ip-num/IPRange";
+import { execSync } from "child_process";
 import _ from "./_";
 
-const asyncExec = promisify(exec);
-
 export function getIPv4AddressesForListen(): string[] {
+
     const addresses = [];
 
     const interfaces = os.networkInterfaces();
@@ -44,6 +42,7 @@ export function getIPv4AddressesForListen(): string[] {
 }
 
 export function getIPv6AddressesForListen(): string[] {
+
     const addresses = [];
 
     const interfaces = os.networkInterfaces();
@@ -63,6 +62,7 @@ export function getIPv6AddressesForListen(): string[] {
 }
 
 export function isPermittedIPAddress(addr: string): boolean {
+
     const [isIPv4] = Validator.isValidIPv4String(addr);
     if (isIPv4) {
         const ipv4 = new IPv4CidrRange(new IPv4(addr), new IPv4Prefix(32));
@@ -87,6 +87,7 @@ export function isPermittedIPAddress(addr: string): boolean {
 }
 
 export function isPermittedHost(url: string, allowedHostname?: string): boolean {
+
     const u = new URL(url);
 
     if (u.hostname === "localhost" || u.hostname === allowedHostname || isPermittedIPAddress(u.hostname) === true) {
@@ -96,9 +97,11 @@ export function isPermittedHost(url: string, allowedHostname?: string): boolean 
     return false;
 }
 
-export async function getLatestVersion(): Promise<string> {
-    const { stdout } = await asyncExec("npm view mirakurun version", { encoding: "utf8" });
-    const latestVersion = stdout.trim();
+export function getLatestVersion(): string {
+
+    const latestVersion = execSync("npm view mirakurun version", {
+        encoding: "utf8"
+    }).trim();
 
     return latestVersion;
 }

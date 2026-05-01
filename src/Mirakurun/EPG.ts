@@ -15,7 +15,7 @@
 */
 import { getProgramItemId } from "./Program";
 import { getTimeFromMJD, getTimeFromBCD24 } from "./common";
-import * as apid from "../../api";
+import * as db from "./db";
 import _ from "./_";
 import { TsChar } from "@chinachu/aribts";
 import { EIT } from "@chinachu/aribts/lib/table/eit";
@@ -117,25 +117,26 @@ interface EventState {
     };
     audio: {
         version: VersionRecord<VersionRecord>; // basic
-        _audios: { [componentTag: number]: apid.ProgramAudio };
+        _audios: { [componentTag: number]: db.ProgramAudio };
     };
     series: {
         version: VersionRecord; // basic
     };
     group: {
         version: VersionRecord<VersionRecord>; // basic
-        _groups: apid.ProgramRelatedItem[][];
+        _groups: db.ProgramRelatedItem[][];
     };
 
     present?: true;
-    following?: true;
 }
 
 // forked from rndomhack/node-aribts/blob/1e7ef94bba3d6ac26aec764bf24dde2c2852bfcb/lib/epg.js
 export default class EPG {
+
     private _epg: { [networkId: number]: { [serviceId: number]: { [eventId: number]: EventState } } } = {};
 
     write(eit: EIT) {
+
         if (!this._epg) {
             return;
         }
@@ -147,7 +148,6 @@ export default class EPG {
         }
 
         const isP = isPF && eit.section_number === 0;
-        const isF = isPF && eit.section_number === 1;
 
         const networkId = eit.original_network_id;
 
@@ -178,9 +178,7 @@ export default class EPG {
                         startAt: getTimeFromMJD(e.start_time),
                         duration: UNKNOWN_DURATION.compare(e.duration) === 0 ? 1 : getTimeFromBCD24(e.duration),
                         isFree: e.free_CA_mode === 0,
-                        _pf: isPF || undefined, // for compatibility
-                        _isPresent: isP || undefined,
-                        _isFollowing: isF || undefined
+                        _pf: isPF || undefined
                     };
                     _.program.add(programItem);
                 }
@@ -212,16 +210,19 @@ export default class EPG {
                         version: {},
                         _groups: []
                     },
-                    present: isP || undefined,
-                    following: isF || undefined
+
+                    present: isP || undefined
                 };
 
-                state.version[eit.table_id] = eit.version_number;
                 service[e.event_id] = state;
             } else {
                 state = service[e.event_id];
 
-                if ((!state.present && isP) || (!state.following && isF) || isOutOfDate(eit, state.version)) {
+                if (!state.present && isP) {
+                    state.present = true;
+                }
+
+                if ((!state.present || (state.present && isP)) && isOutOfDate(eit, state.version)) {
                     state.version[eit.table_id] = eit.version_number;
 
                     if (UNKNOWN_START_TIME.compare(e.start_time) !== 0) {
@@ -229,14 +230,9 @@ export default class EPG {
                             startAt: getTimeFromMJD(e.start_time),
                             duration: UNKNOWN_DURATION.compare(e.duration) === 0 ? 1 : getTimeFromBCD24(e.duration),
                             isFree: e.free_CA_mode === 0,
-                            _pf: isPF || undefined, // for compatibility
-                            _isPresent: isP || undefined,
-                            _isFollowing: isF || undefined
+                            _pf: isPF || undefined
                         });
                     }
-
-                    state.present = isP || undefined;
-                    state.following = isF || undefined;
                 }
             }
 
@@ -317,8 +313,8 @@ export default class EPG {
 
                         _.program.set(state.programId, {
                             video: {
-                                type: <apid.ProgramVideoType> STREAM_CONTENT[d.stream_content] || null,
-                                resolution: <apid.ProgramVideoResolution> COMPONENT_TYPE[d.component_type] || null,
+                                type: <db.ProgramVideoType> STREAM_CONTENT[d.stream_content] || null,
+                                resolution: <db.ProgramVideoResolution> COMPONENT_TYPE[d.component_type] || null,
 
                                 streamContent: d.stream_content,
                                 componentType: d.component_type
@@ -418,6 +414,7 @@ export default class EPG {
 }
 
 function isOutOfDate(eit: EIT, versionRecord: VersionRecord): boolean {
+
     if (
         (versionRecord[0x4E] !== undefined && eit.table_id !== 0x4E) ||
         (versionRecord[0x4F] !== undefined && eit.table_id !== 0x4E && eit.table_id !== 0x4F)
@@ -429,6 +426,7 @@ function isOutOfDate(eit: EIT, versionRecord: VersionRecord): boolean {
 }
 
 function isOutOfDateLv2(eit: EIT, versionRecord: VersionRecord<VersionRecord>, lv2: number): boolean {
+
     if (
         (versionRecord[0x4E] !== undefined && eit.table_id !== 0x4E) ||
         (versionRecord[0x4F] !== undefined && eit.table_id !== 0x4E && eit.table_id !== 0x4F)
@@ -442,7 +440,7 @@ function isOutOfDateLv2(eit: EIT, versionRecord: VersionRecord<VersionRecord>, l
     return versionRecord[eit.table_id][lv2] !== eit.version_number;
 }
 
-function getGenre(content: any): apid.ProgramGenre {
+function getGenre(content: any): db.ProgramGenre {
     return {
         lv1: content.content_nibble_level_1,
         lv2: content.content_nibble_level_2,
@@ -451,16 +449,16 @@ function getGenre(content: any): apid.ProgramGenre {
     };
 }
 
-function getLangCode(buffer: Buffer): apid.ProgramAudioLanguageCode {
+function getLangCode(buffer: Buffer): db.ProgramAudioLanguageCode {
     for (const code in ISO_639_LANG_CODE) {
         if (ISO_639_LANG_CODE[code].compare(buffer) === 0) {
-            return code as apid.ProgramAudioLanguageCode;
+            return code as db.ProgramAudioLanguageCode;
         }
     }
     return "etc";
 }
 
-function getRelatedProgramItem(event: any): apid.ProgramRelatedItem {
+function getRelatedProgramItem(event: any): db.ProgramRelatedItem {
     return {
         type: (
             this.group_type === 1 ? "shared" :

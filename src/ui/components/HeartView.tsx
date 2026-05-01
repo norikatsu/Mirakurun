@@ -25,6 +25,7 @@ import {
 import "./HeartView.css";
 
 const HeartView: React.FC = () => {
+
     const [consented, setConsented] = useState<boolean>(false);
 
     return (

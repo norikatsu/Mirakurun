@@ -40,6 +40,7 @@ class LogEvent extends EventEmitter {
     logs: string[] = [];
 
     emit(ev: "data", level: LogLevel, log: string): boolean {
+
         if (logLevel < level) {
             return;
         }
@@ -96,6 +97,7 @@ class LogEvent extends EventEmitter {
 export const event = new LogEvent();
 
 function getLogString(lvstr: string, msgs: any[]) {
+
     let isoStr: string;
 
     if (offsetStr) {

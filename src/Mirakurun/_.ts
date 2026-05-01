@@ -13,8 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-import * as apid from "../../api";
-import Job from "./Job";
+import * as config from "./config";
 import Event from "./Event";
 import Tuner from "./Tuner";
 import Channel from "./Channel";
@@ -24,14 +23,13 @@ import Server from "./Server";
 
 interface Shared {
     readonly config: {
-        server?: apid.ConfigServer;
-        channels?: apid.ConfigChannels;
-        tuners?: apid.ConfigTuners;
+        server?: config.Server;
+        channels?: config.Channel[];
+        tuners?: config.Tuner[];
     };
     readonly configIntegrity: {
         channels: string;
     };
-    job?: Job;
     event?: Event;
     tuner?: Tuner;
     channel?: Channel;
@@ -40,7 +38,7 @@ interface Shared {
     server?: Server;
 }
 
-export const _: Shared = {
+const _: Shared = {
     config: {},
     configIntegrity: {
         channels: ""

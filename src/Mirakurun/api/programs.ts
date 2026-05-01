@@ -15,11 +15,12 @@
 */
 import { Operation } from "express-openapi";
 import * as api from "../api";
-import * as apid from "../../../api";
+import * as db from "../db";
 import _ from "../_";
 
 export const get: Operation = (req, res) => {
-    let programs: apid.Program[];
+
+    let programs: db.Program[];
 
     // tslint:disable-next-line:prefer-conditional-expression
     if (Object.keys(req.query).length !== 0) {

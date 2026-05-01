@@ -15,17 +15,18 @@
 */
 import { Operation } from "express-openapi";
 import * as api from "../api";
-import * as apid from "../../../api";
+import { Status } from "../../../api";
 import status from "../status";
 import _ from "../_";
 
 const pkg = require("../../../package.json");
 
 export const get: Operation = (req, res) => {
+
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.status(200);
 
-    api.responseJSON(res, getStatus() as apid.Status);
+    res.end(JSON.stringify(getStatus(), null, 2));
 };
 
 get.apiDoc = {
@@ -48,8 +49,9 @@ get.apiDoc = {
     }
 };
 
-export function getStatus(): apid.Status {
-    const ret: apid.Status = {
+export function getStatus(): Status {
+
+    const ret: Status = {
         time: Date.now(),
         version: pkg.version,
         process: {
@@ -61,6 +63,7 @@ export function getStatus(): apid.Status {
                 DOCKER: process.env.DOCKER,
                 DOCKER_NETWORK: process.env.DOCKER_NETWORK,
                 pm_uptime: process.env.pm_uptime,
+                USING_WINSER: process.env.USING_WINSER,
                 NODE_ENV: process.env.NODE_ENV,
                 SERVER_CONFIG_PATH: process.env.SERVER_CONFIG_PATH,
                 TUNERS_CONFIG_PATH: process.env.TUNERS_CONFIG_PATH,

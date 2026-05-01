@@ -37,6 +37,7 @@ function selectHandler(e: React.MouseEvent<HTMLInputElement>) {
 }
 
 const ConnectionGuide: React.FC = () => {
+
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
     const theme = getTheme();

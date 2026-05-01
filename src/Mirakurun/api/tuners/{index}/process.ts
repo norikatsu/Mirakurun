@@ -15,7 +15,6 @@
 */
 import { Operation } from "express-openapi";
 import * as api from "../../../api";
-import * as apid from "../../../../../api";
 import _ from "../../../_";
 
 export const parameters = [
@@ -29,6 +28,7 @@ export const parameters = [
 ];
 
 export const get: Operation = (req, res) => {
+
     const tuner = _.tuner.get(req.params.index as any as number);
 
     if (tuner === null || Number.isInteger(tuner.pid) === false) {
@@ -36,8 +36,7 @@ export const get: Operation = (req, res) => {
         return;
     }
 
-    const tunerProcess: apid.TunerProcess = { pid: tuner.pid };
-    api.responseJSON(res, tunerProcess);
+    api.responseJSON(res, { pid: tuner.pid });
 };
 
 get.apiDoc = {
@@ -66,7 +65,8 @@ get.apiDoc = {
     }
 };
 
-export const del: Operation = async (req, res) => {
+export const del: Operation = (req, res) => {
+
     const tuner = _.tuner.get(req.params.index as any as number);
 
     if (tuner === null || Number.isInteger(tuner.pid) === false) {
@@ -74,14 +74,9 @@ export const del: Operation = async (req, res) => {
         return;
     }
 
-    try {
-        await tuner.kill();
-    } catch (err) {
-        api.responseError(res, 500, err.message);
-        return;
-    }
-
-    res.status(204).end();
+    tuner.kill()
+        .then(() => api.responseJSON(res, {pid: null}))
+        .catch((error: Error) => api.responseError(res, 500, error.message));
 };
 
 del.apiDoc = {
@@ -89,8 +84,16 @@ del.apiDoc = {
     summary: "Kill Tuner Process",
     operationId: "killTunerProcess",
     responses: {
-        204: {
-            description: "Killed"
+        200: {
+            description: "OK",
+            schema: {
+                type: "object",
+                properties: {
+                    pid: {
+                        type: "null"
+                    }
+                }
+            }
         },
         404: {
             description: "Not Found",

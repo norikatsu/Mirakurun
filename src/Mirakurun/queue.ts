@@ -13,9 +13,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-const regexp = {
-    windowsNamedPipe: /^\\\\\.\\pipe\\.+/,
-    unixDomainSocket: /^\/.+/
-};
+import Queue = require("promise-queue");
 
-export default regexp;
+export default new Queue(1, Infinity);

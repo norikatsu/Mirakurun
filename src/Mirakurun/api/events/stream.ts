@@ -14,10 +14,11 @@
    limitations under the License.
 */
 import { Operation } from "express-openapi";
-import * as apid from "../../../../api";
-import Event from "../../Event";
+import * as api from "../../api";
+import Event, { EventMessage } from "../../Event";
 
 export const get: Operation = (req, res) => {
+
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.status(200);
     res.write("[\n");
@@ -27,7 +28,8 @@ export const get: Operation = (req, res) => {
 
     Event.onEvent(_listener);
 
-    function _listener(message: apid.Event) {
+    function _listener(message: EventMessage) {
+
         if (req.query.resource && req.query.resource !== message.resource) {
             return;
         }

@@ -15,14 +15,15 @@
 */
 import { Operation } from "express-openapi";
 import * as api from "../api";
-import * as apid from "../../../api";
+import { Version } from "../../../api";
 import { getLatestVersion } from "../system";
 const pkg = require("../../../package.json");
 
 export const get: Operation = async (req, res) => {
-    const version: apid.Version = {
+
+    const version: Version = {
         current: pkg.version,
-        latest: await getLatestVersion()
+        latest: getLatestVersion()
     };
 
     api.responseJSON(res, version);

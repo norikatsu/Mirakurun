@@ -56,6 +56,7 @@ client.getChannelStream(opt.type, opt.channel, opt.decode)
     });
 
 function exit(code = 0) {
+
     console.error("remote:", "exit.");
 
     if (stream) {

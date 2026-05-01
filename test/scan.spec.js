@@ -1,9 +1,9 @@
-const { describe, it } = require("node:test");
-const assert = require("assert");
+var assert = require('assert');
 
 const scan = require("../lib/Mirakurun/api/config/channels/scan");
 
-describe("[scan.spec] /api/config/channel/scan : generateScanConfig", () => {
+describe("Mirakurun/api/config/channel/scan : generateScanConfig", () => {
+
     it("GR: Type only", () => {
         const config = scan.generateScanConfig({
             type: "GR"
@@ -504,7 +504,8 @@ describe("[scan.spec] /api/config/channel/scan : generateScanConfig", () => {
     });
 });
 
-describe("[scan.spec] /api/config/channel/scan : generateChannelItemForService", () => {
+describe("Mirakurun/api/config/channel/scan : generateChannelItemForService", () => {
+
     it("GR Regular case", () => {
         const type = "GR";
         const ch = "10";
@@ -758,7 +759,8 @@ describe("[scan.spec] /api/config/channel/scan : generateChannelItemForService",
     });
 });
 
-describe("[scan.spec] /api/config/channel/scan : generateChannelItemForChannel (single service)", () => {
+describe("Mirakurun/api/config/channel/scan : generateChannelItemForChannel (single service)", () => {
+
     it("GR Regular case", () => {
         const type = "GR";
         const ch = "10";
@@ -998,7 +1000,8 @@ describe("[scan.spec] /api/config/channel/scan : generateChannelItemForChannel (
     });
 });
 
-describe("[scan.spec] /api/config/channel/scan : generateChannelItemForChannel (multiple service)", () => {
+describe("Mirakurun/api/config/channel/scan : generateChannelItemForChannel (multiple service)", () => {
+
     it("Name Summary regular case.1", () => {
         const type = "GR";
         const ch = "10";
@@ -1568,7 +1571,8 @@ describe("[scan.spec] /api/config/channel/scan : generateChannelItemForChannel (
     });
 });
 
-describe("[scan.spec] /api/config/channel/scan : generateChannelItems", () => {
+describe("Mirakurun/api/config/channel/scan : generateChannelItems", () => {
+
     it("Service mode case.1", () => {
         const mode = "Service";
         const type = "GR";
